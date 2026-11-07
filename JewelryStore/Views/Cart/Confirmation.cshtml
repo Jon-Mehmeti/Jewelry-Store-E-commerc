@@ -1,0 +1,10 @@
+@model Order
+@{ ViewData["Title"] = "Porosia u krye"; }
+<div class="container section text-center"><span class="eyebrow">Faleminderit</span><h1>Porosia u pranua.</h1><p>Numri i porosisë suaj është <strong>@Model.OrderNumber</strong>.</p>
+@if (Model.Payment?.PaymentStatus == "Paid") { 
+    <p class="payment-success">Pagesa u konfirmua me sukses.</p> 
+} else { 
+    <p>Porosia është regjistruar dhe është në pritje të konfirmimit të Pagesës.</p> 
+}
+<a class="button" asp-controller="Catalog" asp-action="Index">Vazhdo blerjet</a>
+</div>

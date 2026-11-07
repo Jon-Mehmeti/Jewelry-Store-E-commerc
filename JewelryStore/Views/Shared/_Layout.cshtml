@@ -1,0 +1,109 @@
+@inject Microsoft.AspNetCore.Identity.UserManager<ApplicationUser> UserManager
+@{
+    var currentCulture = System.Globalization.CultureInfo.CurrentUICulture.Name.StartsWith("en") ? "en" : "sq";
+    var isAuthenticated = User.Identity?.IsAuthenticated == true;
+}
+<!DOCTYPE html>
+<html lang="@currentCulture">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] · PrinciGold</title>
+    <meta name="description" content="PrinciGold — koleksion luksoz bizhuterish të punuara me kujdes në Gjilan." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <header class="site-header">
+        <div class="announcement"><span>Transport falas për porosi mbi 100€</span><span class="announcement-pulse">·</span><span>Oferta e ditës përfundon në <strong data-countdown="2026-12-31T23:59:59">--:--:--</strong></span></div>
+        <nav class="navbar container">
+            <a class="brand" asp-controller="Home" asp-action="Index"><span>P</span> PRINCIGOLD</a>
+            <button class="menu-toggle" type="button" aria-label="Hap menunë" aria-expanded="false">☰</button>
+            <div class="nav-links" id="site-navigation">
+                <a asp-controller="Home" asp-action="Index">Home</a>
+                <a asp-controller="Catalog" asp-action="Index">Koleksioni</a>
+                <a href="@Url.Action("Index", "Home")#story">Rreth nesh</a>
+            </div>
+            <div class="nav-actions">
+                <a class="icon-link" asp-controller="Catalog" asp-action="Index" title="Kërko">⌕</a>
+                @if (isAuthenticated)
+                {
+                    <a class="icon-link" asp-controller="Wishlist" asp-action="Index" title="Wishlist">♡</a>
+                }
+                <a class="icon-link" asp-controller="Cart" asp-action="Index" title="Shporta">🛍</a>
+                @if (isAuthenticated)
+                {
+                    <a class="account-link" asp-area="Identity" asp-page="/Account/Manage/Index">Llogaria</a>
+                }
+                else
+                {
+                    <a class="account-link login-button" asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="@(Context.Request.Path + Context.Request.QueryString)" aria-label="Hyr në llogari">Hyr</a>
+                }
+                <a class="language" asp-controller="Language" asp-action="Set" asp-route-culture="@(currentCulture == "sq" ? "en" : "sq")" asp-route-returnUrl="@Context.Request.Path">@(currentCulture == "sq" ? "EN" : "SQ")</a>
+            </div>
+        </nav>
+    </header>
+    <main>
+        @if (TempData["CartMessage"] is string message)
+        {
+            <div class="toast container">@message</div>
+        }
+        @RenderBody()
+    </main>
+    <div class="quick-view" id="quick-view" hidden aria-hidden="true"><div class="quick-view-backdrop" data-close-quick-view></div><article class="quick-view-card"><button class="quick-view-close" type="button" data-close-quick-view aria-label="Mbyll">×</button><span class="eyebrow" id="quick-view-category"></span><h2 id="quick-view-title"></h2><p id="quick-view-description"></p><strong id="quick-view-price"></strong><a class="button" id="quick-view-link" href="#">Shiko produktin</a></article></div>
+    <footer class="site-footer">
+        <div class="container footer-grid">
+            <div><a class="brand footer-brand" asp-controller="Home" asp-action="Index"><span>P</span> PRINCIGOLD</a><p>Bizhuteri që ruajnë momentet më të bukura.</p></div>
+            <div><h4>Koleksioni</h4><a asp-controller="Catalog" asp-action="Index">Të gjitha produktet</a><a asp-controller="Catalog" asp-action="Index" asp-route-sort="newest">Të rejat</a></div>
+            <div><h4>Ndihmë</h4><a asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="/">Llogaria ime</a><a asp-controller="Cart" asp-action="Orders">Porositë e mia</a></div>
+            <div><h4>Na kontaktoni</h4><p>Gjilan</p></div>
+        </div>
+        <div class="container footer-bottom">© @DateTime.UtcNow.Year PrinciGold. Të gjitha të drejtat e rezervuara.</div>
+    </footer>
+    @await RenderSectionAsync("Scripts", required: false)
+    <script>
+        document.querySelector('.menu-toggle')?.addEventListener('click', function () {
+            const navigation = document.querySelector('#site-navigation');
+            const expanded = this.getAttribute('aria-expanded') === 'true';
+            this.setAttribute('aria-expanded', (!expanded).toString());
+            navigation?.classList.toggle('is-open', !expanded);
+        });
+
+        document.querySelectorAll('[data-countdown]').forEach(function (element) {
+            const target = new Date(element.dataset.countdown).getTime();
+            const update = function () {
+                const remaining = Math.max(0, target - Date.now());
+                const hours = Math.floor(remaining / 3600000).toString().padStart(2, '0');
+                const minutes = Math.floor((remaining % 3600000) / 60000).toString().padStart(2, '0');
+                const seconds = Math.floor((remaining % 60000) / 1000).toString().padStart(2, '0');
+                element.textContent = `${hours}:${minutes}:${seconds}`;
+            };
+            update();
+            window.setInterval(update, 1000);
+        });
+
+        const quickView = document.querySelector('#quick-view');
+        document.querySelectorAll('[data-quick-view]').forEach(function (button) {
+            button.addEventListener('click', function () {
+                document.querySelector('#quick-view-category').textContent = button.dataset.category || '';
+                document.querySelector('#quick-view-title').textContent = button.dataset.name || '';
+                document.querySelector('#quick-view-description').textContent = button.dataset.description || '';
+                document.querySelector('#quick-view-price').textContent = `${button.dataset.price} €`;
+                document.querySelector('#quick-view-link').href = button.dataset.url || '#';
+                quickView.hidden = false;
+                quickView.setAttribute('aria-hidden', 'false');
+                document.body.classList.add('modal-open');
+            });
+        });
+        document.querySelectorAll('[data-close-quick-view]').forEach(function (element) {
+            element.addEventListener('click', function () {
+                quickView.hidden = true;
+                quickView.setAttribute('aria-hidden', 'true');
+                document.body.classList.remove('modal-open');
+            });
+        });
+    </script>
+</body>
+</html>

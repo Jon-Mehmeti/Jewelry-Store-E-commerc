@@ -1,0 +1,21 @@
+@model Product
+<article class="product-card">
+    <a asp-controller="Catalog" asp-action="Details" asp-route-id="@Model.Id" class="product-image">
+        @if (!string.IsNullOrWhiteSpace(Model.ImageUrl)) { <img src="@Model.ImageUrl" alt="@Model.Name" loading="lazy" /> } else { <span class="image-placeholder">PRINCIGOLD</span> }
+        @if (Model.IsFeatured) { <span class="badge">Zgjedhje</span> }
+        @if (Model.DiscountPrice.HasValue) { <span class="sale-badge">Oferta</span> }
+    </a>
+    <div class="product-info">
+        <div><span class="eyebrow">@Model.Category?.Name</span><h3><a asp-controller="Catalog" asp-action="Details" asp-route-id="@Model.Id">@Model.Name</a></h3><span class="stock-note">@(Model.StockQuantity <= 5 ? $"Vetëm {Model.StockQuantity} në stok" : "Në stok · Dërgesë e shpejtë")</span></div>
+        @if (User.Identity?.IsAuthenticated == true)
+        {
+            <div class="price-stack"><strong>@((Model.DiscountPrice ?? Model.Price).ToString("0.00")) €</strong>@if (Model.DiscountPrice.HasValue) { <del>@Model.Price.ToString("0.00") €</del> }</div>
+        }
+        else
+        {
+            <div class="price-stack guest-price"><strong>Kyçu për çmimin</strong></div>
+        }
+    </div>
+    <div class="product-actions"><a class="text-button" asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="@(Context.Request.Path + Context.Request.QueryString)">Kyçu për të parë ofertën <span>→</span></a>@if (User.Identity?.IsAuthenticated == true) { <button class="text-button" type="button" data-quick-view data-category="@Model.Category?.Name" data-name="@Model.Name" data-description="@Model.Description" data-price="@((Model.DiscountPrice ?? Model.Price).ToString("0.00"))" data-url="@Url.Action("Details", "Catalog", new { id = Model.Id })">Shiko shpejt <span>↗</span></button><form asp-controller="Cart" asp-action="Add" method="post"><input type="hidden" name="productId" value="@Model.Id" /><input type="hidden" name="returnUrl" value="@(Context.Request.Path + Context.Request.QueryString)" /><button class="text-button" type="submit">Shto në shportë <span>→</span></button></form> }</div>
+</article>
+

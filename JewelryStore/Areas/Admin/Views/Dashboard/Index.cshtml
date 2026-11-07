@@ -1,0 +1,3 @@
+@{ ViewData["Title"] = "Admin Dashboard"; }
+<section class="page-header"><div class="container"><span class="eyebrow">PrinciGold administration</span><h1>Dashboard</h1></div></section><div class="container section"><div class="category-grid"><div class="category-tile"><span class="eyebrow">Produkte</span><h3>@ViewBag.ProductCount</h3></div><div class="category-tile"><span class="eyebrow">Porosi gjithsej</span><h3>@ViewBag.OrderCount</h3></div><div class="category-tile"><span class="eyebrow">Në pritje</span><h3>@ViewBag.PendingOrders</h3></div></div><p><a class="button" asp-area="Admin" asp-controller="Products" asp-action="Index">Menaxho produktet</a> <a class="button dark" asp-area="Admin" asp-controller="Orders" asp-action="Index">Shiko porositë</a></p></div>
+

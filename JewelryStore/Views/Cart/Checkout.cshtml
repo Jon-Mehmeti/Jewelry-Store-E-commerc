@@ -1,0 +1,25 @@
+@model CheckoutViewModel
+@{ ViewData["Title"] = "Checkout"; }
+<section class="page-header"><div class="container"><span class="eyebrow">PrinciGold checkout</span><h1>Përfundo porosinë</h1></div></section>
+<div class="container section">
+    <form method="post" class="checkout-form">
+        <div asp-validation-summary="ModelOnly"></div>
+        <div class="form-grid">
+            <label>Adresa e dorëzimit<input class="input" asp-for="ShippingAddress" /></label>
+            <label>Qyteti<input class="input" asp-for="City" /></label>
+            <label>Kodi postar<input class="input" asp-for="PostalCode" /></label>
+            <label>Telefoni<input class="input" asp-for="PhoneNumber" /></label>
+        </div>
+        <label>Metoda e pagesës
+            <select class="select" asp-for="PaymentMethod">
+                <option value="Stripe">Kartë bankare · Stripe</option>
+                <option value="PayPal">PayPal</option>
+                <option value="CashOnDelivery">Pagesë në dorëzim</option>
+                <option value="BankTransfer">Transfer bankar</option>
+            </select>
+        </label>
+        <p class="muted">Stripe dhe PayPal ju ridrejtojnë në faqet e tyre të sigurta. Të dhënat e pagesës nuk ruhen në PrinciGold.</p>
+        <button class="button" type="submit">Vazhdo te pagesa</button>
+    </form>
+</div>
+
